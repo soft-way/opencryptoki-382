@@ -1,0 +1,14 @@
+
+if ENABLE_ICSFTOK
+PKCSICSF_DIR = pkcsicsf
+endif
+
+if ENABLE_PKCSEP11_MIGRATE
+PKCSEP11_MIGRATE_DIR = pkcsep11_migrate
+endif
+
+if ENABLE_CCATOK
+PKCSCCA_DIR = pkcscca
+endif
+
+SUBDIRS = pkcsslotd pkcsconf $(PKCSICSF_DIR) $(PKCSEP11_MIGRATE_DIR) $(PKCSCCA_DIR)

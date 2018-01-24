@@ -1,0 +1,70 @@
+/*
+ * COPYRIGHT (c) International Business Machines Corp. 2002-2017
+ *
+ * This program is provided under the terms of the Common Public License,
+ * version 1.0 (CPL-1.0). Any use, reproduction or distribution for this
+ * software constitutes recipient's acceptance of CPL-1.0 terms which can be
+ * found in the file LICENSE file or at
+ * https://opensource.org/licenses/cpl1.0.php
+ */
+
+%{
+/* Parser for /etc/opencryptoki.conf */
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parser.h"
+
+int line_num = 1;
+
+extern void yyerror(const char *s);
+%}
+
+%option noyywrap
+%option nounput
+%option noinput
+
+%%
+
+[\t ]+ 			/* ignore spaces */ ;
+
+= 			return EQUAL;
+
+\{			return BEGIN_DEF;
+
+\n\{			{
+			  line_num++;
+			  return BEGIN_DEF;
+			}
+
+
+\}			 return END_DEF;
+
+\n|#.*\n		{
+			  line_num++;
+			  return EOL;
+			}
+
+[0-9]+			{ /* number */
+			  yylval.num = strtoul(yytext, NULL, 10);
+			  return INTEGER;
+			}
+
+version                 return OCKVERSION;
+slot                    return SLOT;
+
+[^\"= \t\n]+		{
+			  yylval.str = strdup(yytext);
+			  return STRING;
+			}
+
+\"[^\"\n]*\"		{
+			  yylval.str = strdup(yytext+1);
+			  if (yylval.str) yylval.str[strlen(yylval.str)-1]='\0';
+			  return STRING;
+			}
+
+.			yyerror(yytext);
+
+%%

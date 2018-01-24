@@ -1,0 +1,12 @@
+[Unit]
+Description=Daemon which manages cryptographic hardware tokens for the openCryptoki package
+After=local-fs.target
+
+[Service]
+Type=forking
+Environment="LD_LIBRARY_PATH=/opt/gmssl/lib:$LD_LIBRARY_PATH"
+PIDFile=/var/run/pkcsslotd.pid
+ExecStart=@sbindir@/pkcsslotd
+
+[Install]
+WantedBy=multi-user.target
