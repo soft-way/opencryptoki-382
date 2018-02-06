@@ -291,7 +291,7 @@ int bin2hex_format(unsigned char *in, int in_len, unsigned char *out, int *out_l
     return *out_len;
 }
 
-int ock_traceit_hex(trace_level_t lvl, char *file, CK_ULONG line, const char *func, char *token, char *title, char *out, int out_len) {
+int ock_traceit_hex(trace_level_t lvl, char *file, int line, const char *func, char *token, char *title, char *out, int out_len) {
     CK_BYTE buf[8192];
     int len = 0;
     if (out != NULL) {

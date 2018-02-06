@@ -1,6 +1,5 @@
 /*
-
-/***************************************************************************
+***************************************************************************
               Change Log
               ==========
 ****************************************************************************/
@@ -529,6 +528,10 @@ gm11_get_keytype(CK_ATTRIBUTE *attrs, CK_ULONG attrs_len,
         *type = CKK_EC;
         break;
 
+    case CKM_SM2_KEY_PAIR_GEN:
+        *type = CKK_SM2;
+        break;
+
     case CKM_DSA_KEY_PAIR_GEN:
         *type = CKK_DSA;
         break;
@@ -1003,6 +1006,8 @@ static const char* gm11_get_ckm(CK_ULONG mechanism) {
         return "CKM_IBM_ECDH1_DERIVE_RAW";
     case CKM_IBM_RETAINKEY:
         return "CKM_IBM_RETAINKEY";
+    case CKM_SM2_KEY_PAIR_GEN:
+        return "CKM_SM2_KEY_PAIR_GEN";
     default:
         TRACE_WARNING("%s unknown mechanism 0x%lx\n", __func__, mechanism);
         return "UNKNOWN";
@@ -2387,9 +2392,11 @@ static CK_RV rsa_ec_generate_keypair(STDLL_TokData_t *tokdata,
     if (pMechanism->mechanism == CKM_EC_KEY_PAIR_GEN)
         ktype = CKK_EC;
     else if ((pMechanism->mechanism == CKM_RSA_PKCS_KEY_PAIR_GEN) ||
-             (pMechanism->mechanism == CKM_RSA_X9_31_KEY_PAIR_GEN))
+             (pMechanism->mechanism == CKM_RSA_X9_31_KEY_PAIR_GEN)) {
         ktype = CKK_RSA;
-    else {
+    } else if (pMechanism->mechanism == CKM_SM2_KEY_PAIR_GEN) {
+        ktype = CKK_SM2;
+    } else {
         TRACE_ERROR("%s Neither RSA nor EC mech type provided for RSA/EC_key_pair_gen\n",
                     __func__);
         return CKR_MECHANISM_INVALID;
@@ -2720,6 +2727,7 @@ CK_RV gm11tok_generate_key_pair(STDLL_TokData_t *tokdata, SESSION * sess,
     case CKM_EC_KEY_PAIR_GEN:      /* takes same parameters as RSA */
     case CKM_RSA_PKCS_KEY_PAIR_GEN:
     case CKM_RSA_X9_31_KEY_PAIR_GEN:
+    case CKM_SM2_KEY_PAIR_GEN:
         rc = rsa_ec_generate_keypair(tokdata, pMechanism,
                                      public_key_obj->template,
                                      private_key_obj->template,
@@ -3572,7 +3580,6 @@ done:
 
     return rc;
 }
-
 
 /* mechanisms gm11 reports but should be hidden because e.g.
    the EP11 card operates in a FIPS mode that forbides the mechanism,

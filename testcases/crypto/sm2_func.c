@@ -396,7 +396,12 @@ int main(int argc, char *argv[]) {
     init();
     openSession(slotID, rw_sessionFlags, &hSession);
     loginSession(CKU_USER, pin, strlen(pin), hSession);
-    generateSM2KeyPair(hSession, ecKeyLen, &hPublicKey, &hPrivateKey);
+    rc = generateSM2KeyPair(hSession, ecKeyLen, &hPublicKey, &hPrivateKey);
+    if (rc != CKR_OK) {
+        printf("Error generateSM2KeyPair: 0x%08lx\n", rc);
+        return rc;
+    }
+
     for (i = 0; i < (sizeof(signVerifyInput) / sizeof(_signVerifyParam)); i++) {
         SignVerifySM2(
             hSession,

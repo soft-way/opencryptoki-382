@@ -38,11 +38,6 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 
-#include <openssl/bio.h>
-#include <openssl/err.h>
-#include <openssl/ec.h>
-#include <openssl/pem.h>
-
 /*
  * In order to make opencryptoki compatible with
  * OpenSSL 1.1 API Changes and backward compatible
@@ -922,106 +917,8 @@ CK_RV
 os_specific_ec_keygen(TEMPLATE *publ_tmpl,  TEMPLATE *priv_tmpl)
 {
     CK_RV       rc = CKR_OK;
-    EC_KEY      *myecc  = NULL;
-    EVP_PKEY    *pkey   = NULL;
-    int         eccgrp;
-    char        *ECCTYPE = "sm2p256v1";
-    CK_ATTRIBUTE *opaque_attr = NULL;
+    return      rc;
 
-    /* ---------------------------------------------------------- *
-     * These function calls initialize openssl for correct work.  *
-     * ---------------------------------------------------------- */
-    OpenSSL_add_all_algorithms();
-    ERR_load_crypto_strings();
-
-    /* ---------------------------------------------------------- *
-     * Create a EC key sructure, setting the group type from NID  *
-     * ---------------------------------------------------------- */
-    eccgrp = OBJ_txt2nid(ECCTYPE);
-    myecc = EC_KEY_new_by_curve_name(eccgrp);
-
-    /* -------------------------------------------------------- *
-     * For cert signing, we use  the OPENSSL_EC_NAMED_CURVE flag*
-     * ---------------------------------------------------------*/
-    EC_KEY_set_asn1_flag(myecc, OPENSSL_EC_NAMED_CURVE);
-
-    /* -------------------------------------------------------- *
-     * Create the public/private EC key pair here               *
-     * ---------------------------------------------------------*/
-    if (! (EC_KEY_generate_key(myecc))) {
-        TRACE_ERROR("Error generating the ECC key.\n");
-        rc = CKR_GENERAL_ERROR;
-        goto os_specific_ec_keygen_done;
-    }
-
-    /* -------------------------------------------------------- *
-     * Converting the EC key into a PKEY structure let us       *
-     * handle the key just like any other key pair.             *
-     * ---------------------------------------------------------*/
-    pkey = EVP_PKEY_new();
-    if (!EVP_PKEY_assign_EC_KEY(pkey, myecc)) {
-        TRACE_ERROR("Error assigning ECC key to EVP_PKEY structure.\n");
-        rc = CKR_GENERAL_ERROR;
-        goto os_specific_ec_keygen_done;
-    }
-
-    unsigned char publblob[1024];
-    int publblobsize = i2d_PublicKey(pkey, &publblob);
-    if (publblobsize == -1) {
-        TRACE_ERROR("Error fetching public key.\n");
-        rc = CKR_GENERAL_ERROR;
-        goto os_specific_ec_keygen_done;
-    } else {
-        TRACE_DEVEL("Public key size: %d.\n", publblobsize);
-        TRACE_DEVEL_HEX("Public key value", publblob, publblobsize);
-    }
-
-    /* store the blobs */
-    rc = build_attribute(CKA_IBM_OPAQUE, publblob, publblobsize, &opaque_attr);
-    if (rc != CKR_OK) {
-        TRACE_ERROR("%s build_attribute failed with rc=0x%lx\n", __func__, rc);
-        goto os_specific_ec_keygen_done;
-    }
-
-    rc = template_update_attribute(publ_tmpl, opaque_attr);
-    if (rc != CKR_OK) {
-        TRACE_ERROR("%s template_update_attribute failed with rc=0x%lx\n",
-                __func__, rc);
-        goto os_specific_ec_keygen_done;
-    }
-
-    unsigned char privblob[1024];
-    int privblobsize = i2d_PrivateKey(pkey, &privblob);
-    if (privblobsize == -1) {
-        TRACE_ERROR("Error fetching private key.\n");
-        rc = CKR_GENERAL_ERROR;
-        goto os_specific_ec_keygen_done;
-    } else {
-        TRACE_DEVEL("Private key size: %d.\n", privblobsize);
-        TRACE_DEVEL_HEX("Private key value", privblob, privblobsize);
-    }
-    rc = build_attribute(CKA_IBM_OPAQUE, privblob, privblobsize, &opaque_attr);
-    if (rc != CKR_OK) {
-        TRACE_ERROR("%s build_attribute failed with rc=0x%lx\n", __func__, rc);
-        goto os_specific_ec_keygen_done;
-    }
-
-    rc = template_update_attribute(priv_tmpl, opaque_attr);
-    if (rc != CKR_OK) {
-        TRACE_ERROR("%s template_update_attribute failed with rc=0x%lx\n",
-                __func__, rc);
-        goto os_specific_ec_keygen_done;
-    }
-
-
-os_specific_ec_keygen_done:
-    /* ---------------------------------------------------------- *
-     * Free up all structures                                     *
-     * ---------------------------------------------------------- */
-    //EVP_PKEY_free(pkey);
-    EC_KEY_free(myecc);
-
-    return rc;
 }
 
 CK_RV
@@ -1030,6 +927,7 @@ token_specific_ec_sign(STDLL_TokData_t *tokdata, CK_BYTE *in_data,
                  CK_ULONG  *out_data_len, OBJECT *key_obj)
 {
     CK_RV   rc = CKR_OK;
+/*
     EC_KEY  *ec_key = NULL;
     int     type = NID_undef;
     CK_ATTRIBUTE  *attr     = NULL;
@@ -1056,7 +954,7 @@ token_specific_ec_sign(STDLL_TokData_t *tokdata, CK_BYTE *in_data,
     if (!SM2_sign(type, in_data, in_data_len, out_data, out_data_len, pkey)) {
         TRACE_ERROR("Error: SM2_sign\n");
     }
-
+*/
     return rc;
 }
 
@@ -2178,17 +2076,17 @@ MECH_LIST_ELEMENT mech_list[] = {
 	{CKM_AES_CBC, {16, 32, CKF_ENCRYPT|CKF_DECRYPT|CKF_WRAP|CKF_UNWRAP}},
 	{CKM_AES_CBC_PAD, {16, 32, CKF_ENCRYPT|CKF_DECRYPT|CKF_WRAP|CKF_UNWRAP}},
 #endif
-    {CKM_SW_SM2_KEY_PAIR_GEN, {512, 4096, CKF_HW|CKF_GENERATE_KEY_PAIR}},
-    {CKM_SW_SM2, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
-    {CKM_SW_SM2_SM3, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
-    {CKM_SW_SM4_KEY_GEN, {512, 4096, CKF_HW|CKF_GENERATE}},
-    {CKM_SW_SM4_MAC_GENERAL, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
-    {CKM_SW_SM4_MAC, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
-    {CKM_SW_ISO2_SM4_MAC_GENERAL, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
-    {CKM_SW_ISO2_SM4_MAC, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
-    {CKM_SW_SM4_ECB, {512, 4096, CKF_HW|CKF_ENCRYPT|CKF_DECRYPT|CKF_WRAP|CKF_UNWRAP}},
-    {CKM_SW_SM4_CBC, {512, 4096, CKF_HW|CKF_ENCRYPT|CKF_DECRYPT|CKF_WRAP|CKF_UNWRAP}},
-    {CKM_SW_SM4_ECB_ENCRYPT_DATA, {512, 4096, CKF_HW|CKF_DERIVE}},
+    {CKM_SM2_KEY_PAIR_GEN, {512, 4096, CKF_HW|CKF_GENERATE_KEY_PAIR}},
+    {CKM_SM2, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
+    {CKM_SM2_SM3, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
+    {CKM_SM4_KEY_GEN, {512, 4096, CKF_HW|CKF_GENERATE}},
+    {CKM_SM4_MAC_GENERAL, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
+    {CKM_SM4_MAC, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
+    {CKM_ISO2_SM4_MAC_GENERAL, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
+    {CKM_ISO2_SM4_MAC, {512, 4096, CKF_HW|CKF_SIGN|CKF_VERIFY}},
+    {CKM_SM4_ECB, {512, 4096, CKF_HW|CKF_ENCRYPT|CKF_DECRYPT|CKF_WRAP|CKF_UNWRAP}},
+    {CKM_SM4_CBC, {512, 4096, CKF_HW|CKF_ENCRYPT|CKF_DECRYPT|CKF_WRAP|CKF_UNWRAP}},
+    {CKM_SM4_ECB_ENCRYPT_DATA, {512, 4096, CKF_HW|CKF_DERIVE}},
 
     {CKM_GENERIC_SECRET_KEY_GEN, {80, 2048, CKF_GENERATE}},
 
