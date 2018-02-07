@@ -39,4 +39,4 @@ mkdir -p ~/rpmbuild/SOURCES
 cd /
 tar -cf ~/rpmbuild/SOURCES/opencryptoki-${OCK_VERSION}.tar opencryptoki-${OCK_VERSION}
 gzip ~/rpmbuild/SOURCES/opencryptoki-${OCK_VERSION}.tar
-rpmbuild -bb rpm/opencryptoki.spec
+rpmbuild -bb /opencryptoki-${OCK_VERSION}/rpm/opencryptoki.spec
