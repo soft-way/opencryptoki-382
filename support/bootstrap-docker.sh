@@ -40,3 +40,7 @@ cd /
 tar -cf ~/rpmbuild/SOURCES/opencryptoki-${OCK_VERSION}.tar opencryptoki-${OCK_VERSION}
 gzip ~/rpmbuild/SOURCES/opencryptoki-${OCK_VERSION}.tar
 rpmbuild -bb /opencryptoki-${OCK_VERSION}/rpm/opencryptoki.spec
+
+ls -l ~/rpmbuild/RPMS/x86_64/
+
+echo "End"
