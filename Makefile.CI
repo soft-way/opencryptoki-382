@@ -1,9 +1,14 @@
-docker-rpm: ## Build rpm in a docker container
-        @sudo docker run \
-            -v `pwd`:/opencryptoki:rw centos:centos${OS_VERSION} \
-            /bin/bash /opencryptoki/support/bootstrap-docker.sh
+.PHONY: docker-rpm list
+.DEFAULT_GOAL := docker-rpm
 
 list:
-        @sudo docker run \
-            -v `pwd`:/opencryptoki:rw centos:centos${OS_VERSION} \
-            /bin/bash find ~/rpmbuild/RPMS
+	@sudo docker run \
+		-v `pwd`:/opencryptoki:rw centos:centos${OS_VERSION} \
+		/bin/bash find ~/rpmbuild/RPMS
+
+.PHONY: docker-rpm
+docker-rpm: ## create virtual environment typically used for development purposes
+	@sudo docker run \
+		-v `pwd`:/opencryptoki:rw centos:centos${OS_VERSION} \
+		/bin/bash /opencryptoki/support/bootstrap-docker.sh
+
