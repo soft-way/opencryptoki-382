@@ -3,14 +3,13 @@
 set -eux
 
 # set bintray repository
-echo
-"[bintray--softway-rpm]
+ls /etc/yum.repos.d/
+echo "[bintray--softway-rpm]
 name=bintray--softway-rpm
 baseurl=https://dl.bintray.com/softway/rpm/7/x86_64
 gpgcheck=0
 repo_gpgcheck=0
-enabled=1
-" > /etc/yum.repos.d/bintray-softway-rpm.repo
+enabled=1" > /etc/yum.repos.d/bintray-softway-rpm.repo
 
 PACKAGES="
 findutils
