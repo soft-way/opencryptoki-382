@@ -3,6 +3,8 @@
 sudo: required
 
 env:
+  global:
+    - OCK_VERSION=3.8.2
   matrix:
     - PLATFORM=centos DISTRO=el OS_VERSION=7 DOCKER_IMAGE=centos:centos7
 
