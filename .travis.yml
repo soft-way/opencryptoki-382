@@ -4,7 +4,7 @@ sudo: required
 
 env:
   matrix:
-    - PLATFORM=centos DISTRO=el OS_VERSION=7 DOCKER_IMAGE=centos:centos7
+    - PLATFORM=centos OS_VERSION=7 DOCKER_IMAGE=centos:centos7
 
 services:
   - docker

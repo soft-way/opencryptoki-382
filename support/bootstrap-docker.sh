@@ -9,7 +9,9 @@ openssl-devel
 rpm-build
 make
 "
-yum -y install ${PACKAGES}
+for p in `echo ${PACKAGES}`; do
+    yum -y install $p
+done
 
 mkdir -p ~/rpmbuild/SOURCES
 
