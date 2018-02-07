@@ -2,6 +2,8 @@
  
 set -eux
 
+OCK_VERSION=3.8.2
+
 # set bintray repository
 ls /etc/yum.repos.d/
 echo "[bintray--softway-rpm]
