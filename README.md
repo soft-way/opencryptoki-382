@@ -1,4 +1,4 @@
-# openCryptoki
+# openCryptoki [![Build Status](https://travis-ci.org/soft-way/opencryptoki-382.svg?branch=master)](https://travis-ci.org/soft-way/opencryptoki-382)
 
 Package version 3.8.2
 
