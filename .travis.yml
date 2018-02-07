@@ -15,11 +15,11 @@ before_install:
 
 script:
   - make -f Makefile.CI docker-rpm
+  - make -f Makefile.CI list
 
 before_deploy:
   - travis_wait 30 make package
 
 deploy:
-  - make -f Makefile.CI list
 
 notifications:
