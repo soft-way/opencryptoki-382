@@ -7,6 +7,7 @@ list:
 
 .PHONY: docker-rpm
 docker-rpm: ## create virtual environment typically used for development purposes
+	export OCK_VERSION
 	@sudo docker run \
 		-v `pwd`:/opencryptoki-${OCK_VERSION}:rw centos:centos${OS_VERSION} \
 		/bin/bash /opencryptoki-${OCK_VERSION}/support/bootstrap-docker.sh
