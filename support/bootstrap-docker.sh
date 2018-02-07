@@ -16,6 +16,6 @@ done
 mkdir -p ~/rpmbuild/SOURCES
 
 cd /opencryptoki
-tar -cf ~/rpmbuild/SOURCES/pencryptoki-3.8.2.tar *
-gzip ~/rpmbuild/SOURCES/pencryptoki-3.8.2.tar
+tar -cf ~/rpmbuild/SOURCES/opencryptoki-3.8.2.tar *
+gzip ~/rpmbuild/SOURCES/opencryptoki-3.8.2.tar
 rpmbuild -bb rpm/opencryptoki.spec
