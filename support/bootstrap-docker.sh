@@ -10,6 +10,7 @@ baseurl=https://dl.bintray.com/softway/rpm/7/x86_64
 gpgcheck=0
 repo_gpgcheck=0
 enabled=1" > /etc/yum.repos.d/bintray-softway-rpm.repo
+ls /etc/yum.repos.d/
 
 PACKAGES="
 findutils
@@ -33,7 +34,7 @@ done
 
 mkdir -p ~/rpmbuild/SOURCES
 
-cd /opencryptoki
-tar -cf ~/rpmbuild/SOURCES/opencryptoki-3.8.2.tar *
-gzip ~/rpmbuild/SOURCES/opencryptoki-3.8.2.tar
+cd /
+tar -cf ~/rpmbuild/SOURCES/opencryptoki-${OCK_VERSION}.tar opencryptoki-${OCK_VERSION}
+gzip ~/rpmbuild/SOURCES/opencryptoki-${OCK_VERSION}.tar
 rpmbuild -bb rpm/opencryptoki.spec
