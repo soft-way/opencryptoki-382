@@ -1,0 +1,9 @@
+docker-rpm: ## Build rpm in a docker container
+        @sudo docker run \
+            -v `pwd`:/opencryptoki:rw centos:centos${OS_VERSION} \
+            /bin/bash /opencryptoki/support/bootstrap-docker.sh
+
+list:
+        @sudo docker run \
+            -v `pwd`:/opencryptoki:rw centos:centos${OS_VERSION} \
+            /bin/bash find ~/rpmbuild/RPMS
